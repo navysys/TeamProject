@@ -1,0 +1,35 @@
+#include <drawinglayer/primitive2d/transformprimitive2d.hxx>
+#include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
+
+
+using namespace com::sun::star;
+
+
+namespace drawinglayer::primitive2d//primitive2d 내에 drawingplayer이라는 namespace 지정
+{
+        TransformPrimitive2D::TransformPrimitive2D(
+            const basegfx::B2DHomMatrix& rTransformation,
+            const Primitive2DContainer& rChildren) 
+        :   GroupPrimitive2D(rChildren),
+            maTransformation(rTransformation)//transformPrivitive2D의 입력 패러미터를 rChildre,rTransformation으로 초기화
+        {
+        }
+
+        bool TransformPrimitive2D::operator==(const BasePrimitive2D& rPrimitive) const
+        {
+            if(GroupPrimitive2D::operator==(rPrimitive))
+            {
+                const TransformPrimitive2D& rCompare = static_cast< const TransformPrimitive2D& >(rPrimitive);
+
+                return (getTransformation() == rCompare.getTransformation());
+            }
+
+            return false;
+        }//rPrimitive값으로 getTransformation값을 변경
+
+        basegfx::B2DRange TransformPrimitive2D::getB2DRange(const geometry::ViewInformation2D& rViewInformation) const
+        {
+            basegfx::B2DRange aRetval(getChildren().getB2DRange(rViewInformation));
+            aRetval.transform(getTransformation());
+            return aRetval;
+        }
